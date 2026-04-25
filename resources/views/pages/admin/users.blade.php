@@ -1,3 +1,8 @@
+@extends('pages.admin.layout')
+
+@section('title', 'Profile Pengguna - Admin')
+
+@section('content')
 <div class="page-header">
     <h1>Profile Pengguna</h1>
     <p>Kelola data pengguna sistem</p>
@@ -47,3 +52,4 @@
         </tbody>
     </table>
 </div>
+@endsection

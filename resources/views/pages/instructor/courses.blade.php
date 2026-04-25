@@ -1,3 +1,8 @@
+@extends('pages.instructor.layout')
+
+@section('title', 'Daftar Kursus - Instructor')
+
+@section('content')
 <div class="page-header">
     <h1>Daftar Kursus</h1>
     <p>Kursus yang ditugaskan kepada Anda</p>
@@ -43,3 +48,4 @@
         </tbody>
     </table>
 </div>
+@endsection

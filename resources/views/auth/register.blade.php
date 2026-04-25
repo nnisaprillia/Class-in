@@ -87,6 +87,12 @@
                     Masuk di sini
                 </a>
             </p>
+            <p class="text-sm text-gray-600 mt-2">
+                Ingin jadi instruktur?
+                <a href="{{ route('register.instructor') }}" class="font-medium text-green-600 hover:text-green-500 transition-colors duration-200">
+                    Daftar akun instruktur
+                </a>
+            </p>
         </div>
     </form>
 </x-guest-layout>

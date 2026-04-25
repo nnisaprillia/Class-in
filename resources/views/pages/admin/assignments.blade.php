@@ -1,3 +1,8 @@
+@extends('pages.admin.layout')
+
+@section('title', 'Penugasan - Admin')
+
+@section('content')
 <div class="page-header">
     <h1>Penugasan</h1>
     <p>Tugaskan pengajar ke dalam kursus</p>
@@ -48,3 +53,4 @@
         </tbody>
     </table>
 </div>
+@endsection

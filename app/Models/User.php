@@ -6,11 +6,13 @@ namespace App\Models;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'role'])]
+#[Fillable(['name', 'email', 'password', 'role', 'instructor_verified', 'link_cv'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -22,7 +24,7 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
-    protected $fillable = ['name', 'email', 'password', 'role'];
+    protected $fillable = ['name', 'email', 'password', 'role', 'instructor_verified', 'link_cv'];
 
     /**
      * Get the attributes that should be cast.
@@ -34,6 +36,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'instructor_verified' => 'boolean',
         ];
     }
 
@@ -61,11 +64,26 @@ class User extends Authenticatable
         return $this->role === 'instructor';
     }
 
+    public function isVerifiedInstructor(): bool
+    {
+        return $this->role === 'instructor' && $this->instructor_verified;
+    }
+
     /**
      * Check if user is student.
      */
     public function isStudent(): bool
     {
         return $this->role === 'student';
+    }
+
+    public function instructorApplication(): HasOne
+    {
+        return $this->hasOne(InstructorApplication::class);
+    }
+
+    public function certificates(): HasMany
+    {
+        return $this->hasMany(Certificate::class, 'id_user');
     }
 }

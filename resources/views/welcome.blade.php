@@ -297,6 +297,24 @@
         </div>
     </section>
 
+    <section id="instructor-application" class="py-20 bg-white">
+        <div class="container mx-auto px-4 max-w-4xl text-center">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Ingin Menjadi Instruktur?</h2>
+            <p class="text-gray-600 mb-8">
+                Buat akun instruktur terlebih dahulu. Setelah login, Anda dapat mengisi formulir pengajuan validasi di dashboard instruktur.
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="{{ route('register.instructor') }}" class="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+                    Daftar Akun Instruktur
+                </a>
+                {{-- <a href="{{ route('login') }}" class="border-2 border-blue-600 text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-600 hover:text-white transition">
+                    Login Instruktur
+                </a> --}}
+            </div>
+        </div>
+    </section>
+
     <!-- Footer -->
     <footer id="contact" class="bg-gray-900 text-white py-12">
         <div class="container mx-auto px-4">
@@ -331,6 +349,13 @@
                 </div>
 
                 <div>
+                    <h4 class="text-lg font-semibold mb-4">Formulir</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#instructor-application" class="hover:text-white transition">Mau Jadi Instruktur Dong!</a></li>
+                    </ul>
+                </div>
+
+                <!-- <div>
                     <h4 class="text-lg font-semibold mb-4">Platform</h4>
                     <ul class="space-y-2 text-gray-400">
                         <li><a href="#" class="hover:text-white transition">Kursus</a></li>
@@ -338,7 +363,7 @@
                         <li><a href="#" class="hover:text-white transition">Sertifikat</a></li>
                         <li><a href="#" class="hover:text-white transition">Karir</a></li>
                     </ul>
-                </div>
+                </div> -->
 
                 <div>
                     <h4 class="text-lg font-semibold mb-4">Dukungan</h4>
@@ -361,4 +386,110 @@
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
         @vite(['resources/js/app.js'])
     @endif
+    <script>
+        function convertGoogleDriveToPreviewUrl(link) {
+            if (!link) return '';
+
+            const fileIdMatch = link.match(/\/d\/([a-zA-Z0-9_-]+)/) || link.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+            if (!fileIdMatch) return '';
+
+            return `https://drive.google.com/file/d/${fileIdMatch[1]}/preview`;
+        }
+
+        function bindCertificatePreview(inputElement) {
+            const row = inputElement.closest('.certificate-row');
+            const previewWrapper = row.querySelector('.cert-preview-wrapper');
+            const frame = row.querySelector('.cert-preview-frame');
+
+            const update = () => {
+                const previewUrl = convertGoogleDriveToPreviewUrl(inputElement.value.trim());
+                if (previewUrl) {
+                    frame.src = previewUrl;
+                    previewWrapper.classList.remove('hidden');
+                } else {
+                    frame.src = '';
+                    previewWrapper.classList.add('hidden');
+                }
+            };
+
+            inputElement.addEventListener('input', update);
+            update();
+        }
+
+        const tableBody = document.getElementById('certificate-table-body');
+        const addRowButton = document.getElementById('add-certificate-row');
+
+        if (tableBody && addRowButton) {
+            const buildRow = (index) => `
+                <tr class="certificate-row">
+                    <td class="px-4 py-3 border-b">
+                        <input type="text" name="certificates[${index}][cert_name]" required class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                    </td>
+                    <td class="px-4 py-3 border-b">
+                        <input type="url" name="certificates[${index}][cert_link]" required class="w-full border border-gray-300 rounded-lg px-3 py-2 cert-link-input">
+                        <div class="mt-2 cert-preview-wrapper hidden">
+                            <iframe class="w-full h-48 border border-gray-300 rounded-lg cert-preview-frame" src="" loading="lazy"></iframe>
+                        </div>
+                    </td>
+                    <td class="px-4 py-3 border-b">
+                        <button type="button" class="remove-certificate-row text-red-600 hover:text-red-800">Hapus</button>
+                    </td>
+                </tr>
+            `;
+
+            const reindexRows = () => {
+                const rows = tableBody.querySelectorAll('.certificate-row');
+                rows.forEach((row, index) => {
+                    const nameInput = row.querySelector('input[name*="[cert_name]"]');
+                    const linkInput = row.querySelector('input[name*="[cert_link]"]');
+                    nameInput.name = `certificates[${index}][cert_name]`;
+                    linkInput.name = `certificates[${index}][cert_link]`;
+                });
+            };
+
+            addRowButton.addEventListener('click', () => {
+                const index = tableBody.querySelectorAll('.certificate-row').length;
+                tableBody.insertAdjacentHTML('beforeend', buildRow(index));
+                const newInput = tableBody.querySelector('.certificate-row:last-child .cert-link-input');
+                bindCertificatePreview(newInput);
+            });
+
+            tableBody.addEventListener('click', (event) => {
+                if (!event.target.classList.contains('remove-certificate-row')) {
+                    return;
+                }
+
+                const rows = tableBody.querySelectorAll('.certificate-row');
+                if (rows.length === 1) {
+                    return;
+                }
+
+                event.target.closest('.certificate-row').remove();
+                reindexRows();
+            });
+
+            tableBody.querySelectorAll('.cert-link-input').forEach((input) => bindCertificatePreview(input));
+        }
+
+        const cvInput = document.getElementById('cv-link-input');
+        const cvWrapper = document.getElementById('cv-preview-wrapper');
+        const cvFrame = document.getElementById('cv-preview-frame');
+
+        if (cvInput && cvWrapper && cvFrame) {
+            const updateCvPreview = () => {
+                const previewUrl = convertGoogleDriveToPreviewUrl(cvInput.value.trim());
+                if (previewUrl) {
+                    cvFrame.src = previewUrl;
+                    cvWrapper.classList.remove('hidden');
+                } else {
+                    cvFrame.src = '';
+                    cvWrapper.classList.add('hidden');
+                }
+            };
+
+            cvInput.addEventListener('input', updateCvPreview);
+            updateCvPreview();
+        }
+    </script>
 </body>
+</html>

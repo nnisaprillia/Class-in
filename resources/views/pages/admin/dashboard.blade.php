@@ -1,3 +1,8 @@
+@extends('pages.admin.layout')
+
+@section('title', 'Dashboard Admin')
+
+@section('content')
 <div class="page-header">
     <h1>Dashboard Admin</h1>
     <p>Selamat datang di halaman administrator</p>
@@ -8,3 +13,4 @@
     <div class="card"><h3>Total Peserta</h3><div class="value">150</div></div>
     <div class="card"><h3>Total Pengguna</h3><div class="value">165</div></div>
 </div>
+@endsection
